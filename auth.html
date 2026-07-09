@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-
     <meta name="theme-color" content="#060609" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
-
     <title>Horizon.AI — Sign In</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,21 +20,17 @@
             --text: #f7f7fb;
             --muted: #a5a5b5;
             --line: rgba(255, 255, 255, 0.1);
-
             --purple: #7868ff;
             --violet: #a76cff;
             --blue: #548cff;
-
             --radius-xl: 32px;
             --radius-lg: 22px;
             --radius-md: 16px;
             --radius-sm: 12px;
-
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --safe-left: env(safe-area-inset-left, 0px);
             --safe-right: env(safe-area-inset-right, 0px);
-
             --transition-fast: 0.18s cubic-bezier(0.22, 1, 0.36, 1);
             --transition-smooth: 0.3s cubic-bezier(0.22, 1, 0.36, 1);
             --transition-spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -77,38 +71,31 @@
             -webkit-user-select: text;
             user-select: text;
         }
-
         button,
         input,
         a {
             font: inherit;
         }
-
         button {
             color: inherit;
             cursor: pointer;
             touch-action: manipulation;
         }
-
         button:disabled {
             cursor: not-allowed;
             opacity: 0.55;
             pointer-events: none;
         }
-
         a {
             color: inherit;
             text-decoration: none;
         }
-
         ::selection {
             color: #fff;
             background: rgba(120, 104, 255, 0.6);
         }
 
-        /* ==============================
-        BACKGROUND CANVAS
-        ============================== */
+        /* ── Canvas ── */
         #bendCanvas {
             position: fixed;
             inset: 0;
@@ -117,7 +104,6 @@
             height: 100%;
             pointer-events: none;
         }
-
         .background-vignette {
             position: fixed;
             inset: 0;
@@ -128,17 +114,14 @@
                     rgba(6, 6, 9, 0.2) 48%,
                     rgba(6, 6, 9, 0.92) 100%);
         }
-
         .noise {
             position: fixed;
             inset: 0;
             z-index: -3;
-            opacity: 0.032;
+            opacity: 0.025;
             pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
         }
-
-        /* Glow orbs that follow interaction */
         .glow-orb {
             position: fixed;
             z-index: -2;
@@ -155,14 +138,11 @@
             opacity: 0;
             will-change: left, top, opacity;
         }
-
         .glow-orb.visible {
             opacity: 1;
         }
 
-        /* ==============================
-        TOP NAV
-        ============================== */
+        /* ── Topbar ── */
         .topbar {
             position: fixed;
             top: calc(18px + var(--safe-top));
@@ -178,18 +158,14 @@
             border: 1px solid rgba(255, 255, 255, 0.11);
             border-radius: 22px;
             background: rgba(13, 13, 20, 0.8);
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4),
-                inset 0 1px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), inset 0 1px rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(22px) saturate(140%);
             -webkit-backdrop-filter: blur(22px) saturate(140%);
-            transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+            transition: box-shadow var(--transition-smooth);
         }
-
         .topbar.scrolled {
-            box-shadow: 0 8px 36px rgba(0, 0, 0, 0.55),
-                inset 0 1px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 36px rgba(0, 0, 0, 0.55), inset 0 1px rgba(255, 255, 255, 0.05);
         }
-
         .back-button {
             justify-self: start;
             width: 44px;
@@ -201,23 +177,18 @@
             background: rgba(255, 255, 255, 0.04);
             font-size: 18px;
             transition: transform var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
-            -webkit-user-select: none;
-            user-select: none;
         }
-
         .back-button:active {
             transform: scale(0.93);
             background: rgba(255, 255, 255, 0.1);
             box-shadow: 0 0 0 6px rgba(120, 104, 255, 0.08);
         }
-
         @media (hover: hover) {
             .back-button:hover {
                 transform: translateX(-3px);
                 background: rgba(255, 255, 255, 0.08);
             }
         }
-
         .logo {
             grid-column: 2;
             justify-self: center;
@@ -228,7 +199,6 @@
             font-weight: 500;
             letter-spacing: -0.8px;
         }
-
         .brand-icon {
             width: 32px;
             height: 32px;
@@ -236,21 +206,15 @@
             object-fit: contain;
             filter: invert(1);
         }
-
         .gradient-text {
             display: inline-block;
             font-family: "Permanent Marker", sans-serif;
             font-weight: 400;
             color: transparent;
-            background: linear-gradient(90deg,
-                    #f5f5f5 0%,
-                    #c7c0ff 30%,
-                    #8ea7ff 60%,
-                    #d8b9ff 100%);
+            background: linear-gradient(90deg, #f5f5f5 0%, #c7c0ff 30%, #8ea7ff 60%, #d8b9ff 100%);
             background-clip: text;
             -webkit-background-clip: text;
         }
-
         .top-status {
             justify-self: end;
             display: flex;
@@ -259,7 +223,6 @@
             color: #c9c8d3;
             font-size: 11px;
         }
-
         .status-dot {
             width: 7px;
             height: 7px;
@@ -268,7 +231,6 @@
             box-shadow: 0 0 14px rgba(166, 255, 109, 0.85);
             animation: statusPulse 2.5s ease-in-out infinite;
         }
-
         @keyframes statusPulse {
             0%,
             100% {
@@ -279,9 +241,7 @@
             }
         }
 
-        /* ==============================
-        MAIN LAYOUT
-        ============================== */
+        /* ── Main ── */
         main {
             min-height: 100svh;
             min-height: 100dvh;
@@ -290,53 +250,63 @@
             place-items: center;
         }
 
+        /* ── Card ── */
         .auth-shell {
             position: relative;
-            width: min(1040px, 100%);
+            width: min(1000px, 100%);
             display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
+            grid-template-columns: 1fr 0.95fr;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.11);
             border-radius: var(--radius-xl);
             background: rgba(10, 10, 16, 0.74);
-            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55),
-                inset 0 1px rgba(255, 255, 255, 0.06);
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55), inset 0 1px rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
-            animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: cardRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
-
         .auth-shell::before {
             content: "";
             position: absolute;
-            left: -200px;
-            bottom: -230px;
-            width: 440px;
-            height: 440px;
+            left: -180px;
+            bottom: -200px;
+            width: 400px;
+            height: 400px;
             border-radius: 50%;
-            background: rgba(126, 102, 255, 0.22);
-            filter: blur(90px);
+            background: rgba(126, 102, 255, 0.2);
+            filter: blur(80px);
             pointer-events: none;
-            animation: orbDrift 8s ease-in-out infinite;
+            animation: orbDrift 10s ease-in-out infinite;
         }
-
+        .auth-shell::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(135deg,
+                    rgba(120, 104, 255, 0.06) 0%,
+                    transparent 40%,
+                    transparent 60%,
+                    rgba(84, 140, 255, 0.04) 100%);
+            z-index: 0;
+        }
         @keyframes orbDrift {
             0%,
             100% {
                 transform: translate(0, 0);
             }
             33% {
-                transform: translate(30px, -20px);
+                transform: translate(40px, -25px);
             }
             66% {
-                transform: translate(-15px, 15px);
+                transform: translate(-20px, 20px);
             }
         }
-
-        @keyframes rise {
+        @keyframes cardRise {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.98);
+                transform: translateY(36px) scale(0.97);
             }
             to {
                 opacity: 1;
@@ -344,19 +314,22 @@
             }
         }
 
-        /* ==============================
-        INTRO PANEL
-        ============================== */
+        /* ── Intro Panel ── */
         .intro {
             position: relative;
-            min-height: 660px;
-            padding: 48px;
+            z-index: 1;
+            min-height: 620px;
+            padding: 52px 44px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             border-right: 1px solid var(--line);
         }
-
+        .intro-top {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
         .eyebrow {
             width: fit-content;
             padding: 8px 14px;
@@ -370,41 +343,27 @@
             font-size: 12px;
             font-weight: 600;
             backdrop-filter: blur(14px);
-            transition: transform var(--transition-fast);
+            animation: fadeSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
         }
-
-        .eyebrow:active {
-            transform: scale(0.97);
-        }
-
-        .intro-copy {
-            max-width: 510px;
-        }
-
         .intro h1 {
-            margin-top: 26px;
-            font-size: clamp(48px, 6vw, 78px);
+            margin-top: 20px;
+            font-size: clamp(50px, 6vw, 72px);
             line-height: 0.94;
-            letter-spacing: -4px;
+            letter-spacing: -3.5px;
             font-weight: 600;
+            animation: fadeSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
         }
-
         .marker {
             display: inline-block;
             font-family: "Permanent Marker", sans-serif;
             font-weight: 400;
             color: transparent;
-            background: linear-gradient(90deg,
-                    #f5f5f5,
-                    #c7c0ff 35%,
-                    #8ea7ff 65%,
-                    #d8b9ff);
+            background: linear-gradient(90deg, #f5f5f5, #c7c0ff 35%, #8ea7ff 65%, #d8b9ff);
             background-clip: text;
             -webkit-background-clip: text;
             animation: shimmer 3s ease-in-out infinite;
             background-size: 200% 100%;
         }
-
         @keyframes shimmer {
             0%,
             100% {
@@ -414,85 +373,87 @@
                 background-position: 100% 50%;
             }
         }
-
-        .intro p {
-            max-width: 460px;
-            margin-top: 22px;
-            color: var(--muted);
-            font-size: 14.5px;
-            line-height: 1.7;
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
+        .intro p {
+            max-width: 440px;
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+            animation: fadeSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+        }
         .trust-row {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            animation: fadeSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
         }
-
         .trust-pill {
-            padding: 9px 12px;
+            padding: 9px 13px;
             border: 1px solid var(--line);
             border-radius: 11px;
             color: #b8b7c4;
             background: rgba(255, 255, 255, 0.035);
             font-size: 11px;
-            transition: background var(--transition-fast), border-color var(--transition-fast);
+            font-weight: 500;
+            transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
         }
-
         @media (hover: hover) {
             .trust-pill:hover {
                 background: rgba(255, 255, 255, 0.06);
                 border-color: rgba(255, 255, 255, 0.18);
+                transform: translateY(-1px);
             }
         }
 
-        /* ==============================
-        AUTH PANEL
-        ============================== */
+        /* ── Auth Panel ── */
         .auth-panel {
-            min-height: 660px;
-            padding: 42px 40px;
+            position: relative;
+            z-index: 1;
+            min-height: 620px;
+            padding: 42px 38px;
             display: flex;
             align-items: center;
-            background: linear-gradient(145deg,
-                    rgba(116, 92, 255, 0.06),
-                    rgba(255, 255, 255, 0.012));
+            background: linear-gradient(145deg, rgba(116, 92, 255, 0.05), rgba(255, 255, 255, 0.01));
         }
-
         .auth-inner {
             width: 100%;
-            max-width: 380px;
+            max-width: 370px;
             margin: 0 auto;
         }
-
         .auth-heading h2 {
-            font-size: 30px;
-            letter-spacing: -1.3px;
+            font-size: 28px;
+            letter-spacing: -1.1px;
             transition: all var(--transition-smooth);
         }
-
         .auth-heading p {
-            margin-top: 8px;
+            margin-top: 6px;
             color: var(--muted);
-            font-size: 13px;
+            font-size: 12.5px;
             line-height: 1.6;
             transition: all var(--transition-smooth);
         }
 
-        /* ==============================
-        TABS
-        ============================== */
+        /* ── Tabs ── */
         .tabs {
-            margin: 24px 0 16px;
+            margin: 22px 0 14px;
             padding: 4px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             border: 1px solid var(--line);
             border-radius: var(--radius-md);
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.025);
             position: relative;
         }
-
         .tabs::after {
             content: "";
             position: absolute;
@@ -503,13 +464,11 @@
             transition: transform var(--transition-spring);
             z-index: 0;
             pointer-events: none;
-            box-shadow: 0 8px 24px rgba(130, 105, 255, 0.16);
+            box-shadow: 0 8px 28px rgba(130, 105, 255, 0.18);
         }
-
         .tabs.signup-active::after {
             transform: translateX(100%);
         }
-
         .tab {
             position: relative;
             z-index: 1;
@@ -522,27 +481,20 @@
             font-weight: 700;
             cursor: pointer;
             transition: color var(--transition-smooth);
-            -webkit-user-select: none;
-            user-select: none;
         }
-
         .tab.active {
             color: #0a0910;
         }
-
         .tab:active {
             transform: scale(0.96);
         }
 
-        /* ==============================
-        SOCIAL AUTH
-        ============================== */
+        /* ── Social ── */
         .social-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
-
         .oauth {
             min-width: 0;
             min-height: 50px;
@@ -557,29 +509,21 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: transform var(--transition-fast),
-                background var(--transition-fast),
-                border-color var(--transition-fast),
-                box-shadow var(--transition-fast);
-            -webkit-user-select: none;
-            user-select: none;
+            transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
-
         .oauth:active {
             transform: scale(0.94);
             background: rgba(255, 255, 255, 0.09);
             box-shadow: 0 0 0 8px rgba(120, 104, 255, 0.06);
         }
-
         @media (hover: hover) {
             .oauth:hover {
                 transform: translateY(-2px);
                 border-color: rgba(255, 255, 255, 0.17);
                 background: rgba(255, 255, 255, 0.07);
-                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
             }
         }
-
         .provider-icon {
             width: 20px;
             height: 20px;
@@ -587,15 +531,13 @@
             display: grid;
             place-items: center;
         }
-
         .provider-icon svg {
             width: 18px;
             height: 18px;
             display: block;
         }
-
         .divider {
-            margin: 16px 0;
+            margin: 15px 0;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -604,7 +546,6 @@
             text-transform: uppercase;
             letter-spacing: 1.3px;
         }
-
         .divider::before,
         .divider::after {
             content: "";
@@ -613,30 +554,24 @@
             background: var(--line);
         }
 
-        /* ==============================
-        FORM
-        ============================== */
+        /* ── Form ── */
         form {
             display: grid;
-            gap: 13px;
+            gap: 12px;
         }
-
         .field {
             display: grid;
-            gap: 7px;
+            gap: 6px;
         }
-
         label {
             color: #c8c7d1;
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.3px;
         }
-
         .input-wrap {
             position: relative;
         }
-
         input {
             width: 100%;
             min-height: 50px;
@@ -647,30 +582,21 @@
             color: var(--text);
             background: rgba(255, 255, 255, 0.035);
             font-size: 13.5px;
-            transition: border-color var(--transition-fast),
-                box-shadow var(--transition-fast),
-                background var(--transition-fast);
-            -webkit-user-select: text;
-            user-select: text;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
         }
-
         input::placeholder {
             color: #686774;
         }
-
         input:focus {
             border-color: rgba(142, 126, 255, 0.7);
             background: rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 0 5px rgba(120, 104, 255, 0.09);
         }
-
-        /* Autofill styling */
         input:-webkit-autofill {
             -webkit-box-shadow: 0 0 0 50px #0f0f17 inset;
             -webkit-text-fill-color: #f7f7fb;
             caret-color: #f7f7fb;
         }
-
         .input-icon {
             position: absolute;
             right: 14px;
@@ -681,11 +607,9 @@
             font-size: 13px;
             transition: color var(--transition-fast);
         }
-
         input:focus~.input-icon {
             color: #a99cff;
         }
-
         .password-toggle {
             position: absolute;
             right: 6px;
@@ -700,19 +624,17 @@
             cursor: pointer;
             font-size: 13px;
             transition: background var(--transition-fast), color var(--transition-fast);
+            z-index: 2;
         }
-
         .password-toggle:active {
             background: rgba(255, 255, 255, 0.08);
             color: #c7c0ff;
         }
-
         @media (hover: hover) {
             .password-toggle:hover {
                 background: rgba(255, 255, 255, 0.05);
             }
         }
-
         .form-meta {
             display: flex;
             align-items: center;
@@ -720,42 +642,35 @@
             gap: 14px;
             font-size: 11px;
         }
-
         .remember {
             display: flex;
             align-items: center;
             gap: 8px;
             color: #aaa9b6;
             cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
         }
-
         .remember input {
             width: 16px;
             min-height: 16px;
             accent-color: var(--purple);
             cursor: pointer;
             border-radius: 4px;
+            padding: 0;
         }
-
         .forgot {
             color: #a99cff;
             font-weight: 500;
             transition: color var(--transition-fast);
         }
-
         .forgot:active {
             color: #c7c0ff;
         }
-
         @media (hover: hover) {
             .forgot:hover {
                 color: #c7c0ff;
                 text-decoration: underline;
             }
         }
-
         .submit {
             width: 100%;
             min-height: 50px;
@@ -768,17 +683,12 @@
             font-weight: 800;
             letter-spacing: 0.2px;
             cursor: pointer;
-            transition: transform var(--transition-fast),
-                box-shadow var(--transition-fast);
-            -webkit-user-select: none;
-            user-select: none;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
         }
-
         .submit:active {
             transform: scale(0.95);
             box-shadow: 0 8px 28px rgba(130, 105, 255, 0.35);
         }
-
         @media (hover: hover) {
             .submit:hover:not(:disabled) {
                 transform: translateY(-3px);
@@ -786,9 +696,7 @@
             }
         }
 
-        /* ==============================
-        GUEST
-        ============================== */
+        /* ── Guest ── */
         .guest-button {
             width: 100%;
             min-height: 44px;
@@ -804,20 +712,14 @@
             font-size: 11px;
             font-weight: 600;
             cursor: pointer;
-            transition: color var(--transition-fast),
-                background var(--transition-fast),
-                border-color var(--transition-fast);
-            -webkit-user-select: none;
-            user-select: none;
+            transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
         }
-
         .guest-button:active {
             color: #fff;
             border-color: var(--line);
             background: rgba(255, 255, 255, 0.04);
             transform: scale(0.97);
         }
-
         @media (hover: hover) {
             .guest-button:hover {
                 color: #fff;
@@ -825,7 +727,6 @@
                 background: rgba(255, 255, 255, 0.03);
             }
         }
-
         .terms {
             margin-top: 10px;
             color: #73727d;
@@ -833,23 +734,18 @@
             line-height: 1.6;
             text-align: center;
         }
-
         .terms a {
             color: #a99cff;
             font-weight: 500;
         }
-
         .terms a:active {
             color: #c7c0ff;
         }
-
         .hidden {
             display: none !important;
         }
 
-        /* ==============================
-        TOAST
-        ============================== */
+        /* ── Toast ── */
         .toast {
             position: fixed;
             left: 50%;
@@ -873,26 +769,21 @@
             transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             touch-action: pan-y;
         }
-
         .toast.show {
             opacity: 1;
             transform: translate(-50%, 0);
             pointer-events: auto;
         }
-
         .toast.error {
             color: #ffd7dd;
             border-color: rgba(255, 123, 139, 0.25);
             background: rgba(45, 14, 22, 0.94);
         }
-
         .toast.swiping {
             transition: none;
         }
 
-        /* ==============================
-        LOADER
-        ============================== */
+        /* ── Spinner ── */
         .spinner {
             width: 16px;
             height: 16px;
@@ -902,16 +793,13 @@
             border-radius: 50%;
             animation: spin 0.65s linear infinite;
         }
-
         @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
         }
 
-        /* ==============================
-        RESPONSIVE - TABLET & BELOW
-        ============================== */
+        /* ── Responsive: Tablet & below ── */
         @media (max-width: 820px) {
             .topbar {
                 top: calc(10px + var(--safe-top));
@@ -920,41 +808,34 @@
                 padding: 0 10px;
                 border-radius: 18px;
             }
-
             .back-button {
                 width: 40px;
                 height: 40px;
                 border-radius: 12px;
                 font-size: 16px;
             }
-
             .top-status span:last-child {
                 display: none;
             }
-
             .logo {
                 font-size: 17px;
                 gap: 7px;
             }
-
             .brand-icon {
                 width: 28px;
                 height: 28px;
             }
-
             main {
                 padding: calc(88px + var(--safe-top)) 8px calc(16px + var(--safe-bottom));
                 align-items: start;
             }
-
             .auth-shell {
                 width: min(540px, 100%);
                 grid-template-columns: 1fr;
                 border-radius: 26px;
-                animation: riseMobile 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+                animation: cardRiseMobile 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
             }
-
-            @keyframes riseMobile {
+            @keyframes cardRiseMobile {
                 from {
                     opacity: 0;
                     transform: translateY(40px) scale(0.96);
@@ -964,50 +845,42 @@
                     transform: translateY(0) scale(1);
                 }
             }
-
             .intro {
                 min-height: auto;
-                padding: 28px 22px 22px;
+                padding: 28px 22px 20px;
                 border-right: 0;
                 border-bottom: 1px solid var(--line);
-                gap: 16px;
+                gap: 14px;
             }
-
             .intro h1 {
-                margin-top: 16px;
-                font-size: clamp(42px, 14vw, 62px);
-                letter-spacing: -3px;
-            }
-
-            .intro p {
-                font-size: 12.5px;
                 margin-top: 14px;
+                font-size: clamp(40px, 13vw, 58px);
+                letter-spacing: -2.5px;
             }
-
+            .intro p {
+                font-size: 12px;
+                margin-top: 10px;
+                max-width: 100%;
+            }
             .trust-row {
-                margin-top: 16px;
+                margin-top: 12px;
                 gap: 6px;
             }
-
             .trust-pill {
                 font-size: 10px;
                 padding: 7px 10px;
                 border-radius: 9px;
             }
-
             .auth-panel {
                 min-height: auto;
-                padding: 28px 22px 32px;
+                padding: 26px 22px 30px;
             }
-
             .auth-inner {
                 max-width: 100%;
             }
-
             .social-grid {
                 gap: 8px;
             }
-
             .oauth {
                 min-height: 46px;
                 font-size: 11px;
@@ -1015,83 +888,66 @@
             }
         }
 
-        /* ==============================
-        RESPONSIVE - SMALL PHONES
-        ============================== */
+        /* ── Responsive: Small phones ── */
         @media (max-width: 440px) {
             .topbar {
                 height: 54px;
                 border-radius: 16px;
                 padding: 0 8px;
             }
-
             .back-button {
                 width: 36px;
                 height: 36px;
                 border-radius: 10px;
             }
-
             .logo {
                 font-size: 15px;
                 gap: 6px;
             }
-
             .brand-icon {
                 width: 26px;
                 height: 26px;
             }
-
             .intro {
-                padding: 24px 16px 18px;
+                padding: 22px 16px 16px;
             }
-
             .intro h1 {
-                font-size: clamp(36px, 12vw, 50px);
-                letter-spacing: -2.5px;
+                font-size: clamp(34px, 11vw, 46px);
+                letter-spacing: -2px;
             }
-
             .auth-panel {
-                padding: 24px 16px 28px;
+                padding: 22px 16px 26px;
             }
-
             .auth-shell {
                 border-radius: 22px;
             }
-
             .social-grid {
                 grid-template-columns: 1fr;
                 gap: 7px;
             }
-
             .submit {
                 min-height: 46px;
                 font-size: 12px;
                 border-radius: 14px;
             }
-
             input {
                 min-height: 46px;
                 font-size: 13px;
                 border-radius: 14px;
             }
-
             .tabs {
                 border-radius: 13px;
             }
-
             .tab {
                 min-height: 38px;
                 font-size: 11px;
             }
-
             .tabs::after {
                 border-radius: 10px;
             }
         }
 
-        /* ==============================
-        REDUCED MOTION
-        ============================== */
+        /* ── Reduced motion ── */
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
@@ -1128,18 +984,18 @@
         <section class="auth-shell">
             <!-- INTRO -->
             <div class="intro">
-                <div class="intro-copy">
+                <div class="intro-top">
                     <div class="eyebrow">
                         <span class="status-dot"></span>
-                        Your workspace is ready
+                        Your workspace awaits
                     </div>
-                    <h1>Return to the <span class="marker">horizon</span>.</h1>
-                    <p>Sign in to continue your conversations, projects and ideas across the world's most capable AI models.</p>
+                    <h1>Welcome to the <span class="marker">horizon</span>.</h1>
+                    <p>Pick up your conversations, projects, and ideas — all in one place.</p>
                 </div>
                 <div class="trust-row">
-                    <span class="trust-pill">◌ Private workspace</span>
-                    <span class="trust-pill">⚡ Fast access</span>
-                    <span class="trust-pill">✦ One account</span>
+                    <span class="trust-pill">Private workspace</span>
+                    <span class="trust-pill">Fast access</span>
+                    <span class="trust-pill">One account</span>
                 </div>
             </div>
 
@@ -1148,7 +1004,7 @@
                 <div class="auth-inner">
                     <div class="auth-heading">
                         <h2 id="authTitle">Welcome back.</h2>
-                        <p id="authSubtitle">Continue where you left off. Your tabs probably missed you.</p>
+                        <p id="authSubtitle">Pick up where you left off.</p>
                     </div>
 
                     <!-- TABS -->
@@ -1223,7 +1079,8 @@
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js";
         import {
             getAuth,
-            signInWithPopup,
+            signInWithRedirect,
+            getRedirectResult,
             GithubAuthProvider,
             GoogleAuthProvider,
             onAuthStateChanged,
@@ -1286,6 +1143,7 @@
 
         let mode = "login";
         let loading = false;
+        let redirectProcessed = false;
         let toastTimer;
         let toastSwipeStart = null;
         let toastSwipeOffset = 0;
@@ -1371,7 +1229,8 @@
             const buttons = [submitButton, googleButton, githubButton, guestButton, loginTab, signupTab];
             buttons.forEach(button => { button.disabled = state; });
             if (source === "email") {
-                submitButton.innerHTML = state ? '<span class="spinner"></span>' : mode === "signup" ? "Create account →" : "Enter Horizon →";
+                submitButton.innerHTML = state ? '<span class="spinner"></span>' : mode === "signup" ?
+                    "Create account →" : "Enter Horizon →";
             }
             if (source === "google") {
                 googleButton.innerHTML = state ? '<span class="spinner"></span>' : googleButton.dataset.original;
@@ -1399,7 +1258,7 @@
                 "auth/popup-closed-by-user": "The sign-in window was closed.",
                 "auth/popup-blocked": "Your browser blocked the sign-in popup.",
                 "auth/account-exists-with-different-credential": "This email already uses another sign-in method.",
-                "auth/operation-not-allowed": "This login method is not enabled in Firebase.",
+                "auth/operation-not-allowed": "This login method is not enabled.",
                 "auth/network-request-failed": "Network error. Check your connection.",
                 "auth/too-many-requests": "Too many attempts. Try again later."
             };
@@ -1444,7 +1303,7 @@
             nameInput.required = isSignup;
             passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
             authTitle.textContent = isSignup ? "Create your account." : "Welcome back.";
-            authSubtitle.textContent = isSignup ? "One account. Every model. Consider the tab situation handled." : "Continue where you left off. Your tabs probably missed you.";
+            authSubtitle.textContent = isSignup ? "One account, every model." : "Pick up where you left off.";
             submitButton.textContent = isSignup ? "Create account →" : "Enter Horizon →";
         }
 
@@ -1462,7 +1321,7 @@
         });
 
         /* ==============================
-        GOOGLE AUTH
+        GOOGLE AUTH — redirect
         ============================== */
         googleButton.addEventListener("click", async () => {
             if (loading) return;
@@ -1470,11 +1329,8 @@
             try {
                 const provider = new GoogleAuthProvider();
                 provider.setCustomParameters({ prompt: "select_account" });
-                const result = await signInWithPopup(auth, provider);
-                await saveUser(result.user, "google");
-                track("login", { method: "google" });
-                showToast("Welcome to Horizon.");
-                setTimeout(redirectToApp, 400);
+                await signInWithRedirect(auth, provider);
+                // Page will redirect away; loading stays until redirect completes
             } catch (error) {
                 console.error(error);
                 showToast(getErrorMessage(error), "error");
@@ -1483,7 +1339,7 @@
         });
 
         /* ==============================
-        GITHUB AUTH
+        GITHUB AUTH — redirect
         ============================== */
         githubButton.addEventListener("click", async () => {
             if (loading) return;
@@ -1492,11 +1348,8 @@
                 const provider = new GithubAuthProvider();
                 provider.addScope("read:user");
                 provider.addScope("user:email");
-                const result = await signInWithPopup(auth, provider);
-                await saveUser(result.user, "github");
-                track("login", { method: "github" });
-                showToast("GitHub connected.");
-                setTimeout(redirectToApp, 400);
+                await signInWithRedirect(auth, provider);
+                // Page will redirect away
             } catch (error) {
                 console.error(error);
                 showToast(getErrorMessage(error), "error");
@@ -1576,22 +1429,50 @@
         });
 
         /* ==============================
-        AUTH STATE - REDIRECT IF LOGGED IN
+        HANDLE REDIRECT RESULT ON PAGE LOAD
+        ============================== */
+        async function handleRedirectResult() {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result && !redirectProcessed) {
+                    redirectProcessed = true;
+                    const providerId = result.user.providerData[0]?.providerId || "";
+                    const provider = providerId.includes("google") ? "google" :
+                        providerId.includes("github") ? "github" : "redirect";
+                    await saveUser(result.user, provider);
+                    track("login", { method: provider });
+                    showToast("Welcome to Horizon.");
+                    setTimeout(redirectToApp, 400);
+                }
+            } catch (error) {
+                console.error("Redirect sign-in failed:", error);
+                showToast(getErrorMessage(error), "error");
+            }
+        }
+
+        /* ==============================
+        AUTH STATE — REDIRECT IF LOGGED IN
         ============================== */
         let initialAuthCheck = true;
         onAuthStateChanged(auth, user => {
+            if (redirectProcessed) return;
             if (initialAuthCheck && user) {
                 initialAuthCheck = false;
+                redirectProcessed = true;
                 redirectToApp();
                 return;
             }
             initialAuthCheck = false;
         });
 
+        // Check for redirect result on load
+        handleRedirectResult();
+
         /* ==============================
-        GLOW ORB - FOLLOWS POINTER
+        GLOW ORB
         ============================== */
         let orbTimeout;
+
         function moveGlowOrb(x, y) {
             glowOrb.style.left = x + "px";
             glowOrb.style.top = y + "px";
@@ -1601,11 +1482,9 @@
                 glowOrb.classList.remove("visible");
             }, 1800);
         }
-
         document.addEventListener("pointermove", (e) => {
             moveGlowOrb(e.clientX, e.clientY);
         });
-
         document.addEventListener("pointerdown", (e) => {
             moveGlowOrb(e.clientX, e.clientY);
         });
@@ -1618,12 +1497,14 @@
         let width = 0;
         let height = 0;
         let dpr = 1;
-
         const mouse = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 };
         const bends = [
-            { y: 0.18, amplitude: 85, frequency: 0.0018, speed: 0.00032, width: 150, colorA: "104, 91, 255", colorB: "91, 180, 255" },
-            { y: 0.49, amplitude: 130, frequency: 0.00135, speed: -0.00022, width: 180, colorA: "157, 91, 255", colorB: "78, 116, 255" },
-            { y: 0.78, amplitude: 105, frequency: 0.00155, speed: 0.00018, width: 170, colorA: "82, 127, 255", colorB: "174, 93, 255" }
+            { y: 0.18, amplitude: 85, frequency: 0.0018, speed: 0.00032, width: 150, colorA: "104, 91, 255",
+                colorB: "91, 180, 255" },
+            { y: 0.49, amplitude: 130, frequency: 0.00135, speed: -0.00022, width: 180, colorA: "157, 91, 255",
+                colorB: "78, 116, 255" },
+            { y: 0.78, amplitude: 105, frequency: 0.00155, speed: 0.00018, width: 170, colorA: "82, 127, 255",
+                colorB: "174, 93, 255" }
         ];
 
         function resizeCanvas() {
@@ -1644,14 +1525,16 @@
             const points = [];
             for (let x = -200; x <= width + 200; x += 16) {
                 const wave1 = Math.sin((x + horizontalShift) * bend.frequency + time * bend.speed) * bend.amplitude;
-                const wave2 = Math.sin(x * bend.frequency * 0.47 - time * bend.speed * 0.8 + index) * bend.amplitude * 0.45;
+                const wave2 = Math.sin(x * bend.frequency * 0.47 - time * bend.speed * 0.8 + index) * bend.amplitude *
+                    0.45;
                 points.push({ x, y: baseY + wave1 + wave2 + mouseShift });
             }
             ctx.save();
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.beginPath();
-            points.forEach((point, i) => { i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y); });
+            points.forEach((point, i) => { i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point
+                    .y); });
             const gradient = ctx.createLinearGradient(0, 0, width, height);
             gradient.addColorStop(0, `rgba(${bend.colorA}, 0)`);
             gradient.addColorStop(0.25, `rgba(${bend.colorA}, 0.25)`);
@@ -1696,11 +1579,10 @@
             mouse.targetX = event.clientX / window.innerWidth;
             mouse.targetY = event.clientY / window.innerHeight;
         });
-
         window.addEventListener("resize", resizeCanvas);
 
         /* ==============================
-        SCROLL AWARENESS FOR TOPBAR
+        SCROLL AWARENESS
         ============================== */
         window.addEventListener("scroll", () => {
             topbar.classList.toggle("scrolled", window.scrollY > 10);
@@ -1710,7 +1592,7 @@
         animate(0);
 
         /* ==============================
-        PREVENT OVERSCROLL BOUNCE ON FORM ELEMENTS
+        PREVENT OVERSCROLL BOUNCE
         ============================== */
         document.addEventListener("touchmove", function(e) {
             if (e.target.closest("input, textarea")) return;
