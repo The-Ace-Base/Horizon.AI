@@ -187,7 +187,9 @@
     .message-body{flex:1;min-width:0}
     .message-head{height:31px;display:flex;align-items:center;gap:8px}
     .message-author{font-size:12px;font-weight:700}
-    .message-content{font-size:15px;line-height:1.76;word-break:break-word;background:var(--surface);border-radius:22px;padding:18px 22px;}
+    .message-content{font-size:15px;
+     font-family: "Lexend", sans-serif;
+     line-height:1.76;word-break:break-word;background:var(--surface);border-radius:22px;padding:18px 22px;}
     .message.user .message-content{background:var(--accent-soft);}
     .message-content p+p{margin-top:13px}
     .message-content h1,.message-content h2,.message-content h3{margin:22px 0 10px;font-family:Lexend,sans-serif;line-height:1.25}
@@ -340,7 +342,9 @@
     .tag{padding:3px 6px;border-radius:999px;background:var(--surface-hover);color:var(--muted);font-size:7px}
     .empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:11px}
 
-    .toast{position:fixed;left:50%;bottom:20px;z-index:300;max-width:calc(100% - 28px);padding:11px 15px;transform:translate(-50%,25px);border:1px solid var(--line);border-radius:13px;background:var(--panel);box-shadow:var(--shadow);font-size:10px;opacity:0;pointer-events:none;transition:.22s;}
+    .toast{position:fixed;left:50%;bottom:20px;z-index:300;max-width:calc(100% - 28px);font-family: "Inter", sans-serif;padding:11px 15px;transform:translate(-50%,25px);border:1px solid var(--line);border-radius:13px;background:var(--panel);box-shadow:var(--shadow);font-size:10px;opacity:0;pointer-events:none;transition:.22s; white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;}
     .toast.show{opacity:1;transform:translate(-50%,0)}
 
     .mobile-backdrop{display:none}
