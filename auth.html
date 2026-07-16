@@ -324,7 +324,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── New additions: validation, strength, skeleton, verification ── */
+        /* ── Validation, strength, skeleton, verification ── */
         .field .error-message { font-size: 10px; color: #ff8a9a; min-height: 16px; margin-top: 2px; }
         .password-strength { margin-top: 4px; }
         .strength-bar {
@@ -613,6 +613,8 @@
         import {
             getAuth,
             signInWithPopup,
+            signInWithRedirect,
+            getRedirectResult,
             GoogleAuthProvider,
             GithubAuthProvider,
             onAuthStateChanged,
@@ -690,6 +692,7 @@
         let lockTimer = null;
         let lockedUntil = 0;
         let offlineMode = false;
+        let socialInProgress = false;
 
         // ── Utility ──
         function showToast(message, type = "normal") {
@@ -718,7 +721,7 @@
                 submitButton.disabled = isLoading || offlineMode || isLocked();
                 submitButton.innerHTML = isLoading ? `<span class="spinner"></span> ${message}` : (mode === "signup" ? "Create account →" : "Enter Horizon →");
             } else if (buttons[source]) {
-                buttons[source].disabled = isLoading || offlineMode || isLocked();
+                buttons[source].disabled = isLoading || offlineMode || isLocked() || socialInProgress;
                 if (isLoading) {
                     buttons[source].querySelector('.btn-text').textContent = message;
                 } else {
@@ -731,9 +734,7 @@
         githubButton.dataset.original = "GitHub";
         guestButton.dataset.original = "Guest";
 
-        function isLocked() {
-            return Date.now() < lockedUntil;
-        }
+        function isLocked() { return Date.now() < lockedUntil; }
 
         function startRateLimitLock() {
             lockedUntil = Date.now() + 30000;
@@ -760,6 +761,10 @@
             lockedUntil = 0;
             if (lockTimer) clearTimeout(lockTimer);
             submitButton.disabled = googleButton.disabled = githubButton.disabled = guestButton.disabled = false;
+        }
+
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || window.innerWidth < 820;
         }
 
         // ── Validation ──
@@ -818,17 +823,13 @@
             strengthFill.style.background = colors[score - 1] || colors[0];
         }
 
-        // ── Persistence ──
         async function applyPersistence() {
             const remember = document.getElementById("remember").checked;
             try {
                 await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-            } catch (error) {
-                console.warn("Persistence error:", error);
-            }
+            } catch (error) { console.warn("Persistence error:", error); }
         }
 
-        // ── Email Verification ──
         function showVerificationScreen(email) {
             authFormContainer.style.display = "none";
             verificationScreen.classList.add("active");
@@ -844,18 +845,14 @@
             try {
                 await auth.currentUser.reload();
                 return auth.currentUser.emailVerified;
-            } catch (e) {
-                return false;
-            }
+            } catch (e) { return false; }
         }
 
-        // ── Redirect ──
         function redirectToApp() {
             document.body.classList.add("fade-out");
             setTimeout(() => { location.replace("app.html"); }, 200);
         }
 
-        // ── Auto‑switch after signup ──
         async function handleEmailSignup(email, password, name) {
             const result = await createUserWithEmailAndPassword(auth, email, password);
             if (name) await updateProfile(result.user, { displayName: name });
@@ -869,9 +866,13 @@
 
         function pollVerification(user) {
             const interval = setInterval(async () => {
+                if (!auth.currentUser) {
+                    clearInterval(interval);
+                    return;
+                }
                 try {
-                    await user.reload();
-                    if (user.emailVerified) {
+                    await auth.currentUser.reload();
+                    if (auth.currentUser.emailVerified) {
                         clearInterval(interval);
                         showToast("Email verified! Signing you in...");
                         setTimeout(redirectToApp, 600);
@@ -880,7 +881,6 @@
             }, 3000);
         }
 
-        // ── Save user ──
         async function saveUser(user, provider) {
             if (!user) return;
             try {
@@ -896,39 +896,70 @@
             } catch (error) { console.error("Failed to save user:", error); }
         }
 
-        // ── Social / Guest handlers ──
-        async function handleSocialLogin(provider, providerName) {
-            if (loading || offlineMode || isLocked()) return;
+        async function finishSocialLogin(userCredential, providerName) {
+            await saveUser(userCredential.user, providerName);
+            resetFailedAttempts();
+            track("login", { method: providerName });
+            showToast(`👋 Welcome, ${userCredential.user.displayName || ''}`);
+            redirectToApp();
+        }
+
+        async function startSocialLogin(provider, providerName) {
+            if (loading || offlineMode || isLocked() || socialInProgress) return;
+            socialInProgress = true;
             setLoadingState(providerName, true, `Connecting ${providerName}...`);
             try {
-                const result = await signInWithPopup(auth, provider);
-                await saveUser(result.user, providerName);
-                resetFailedAttempts();
-                track("login", { method: providerName });
-                showToast(`👋 Welcome, ${result.user.displayName || ''}`);
-                redirectToApp();
+                if (isMobile()) {
+                    await signInWithRedirect(auth, provider);
+                } else {
+                    const result = await signInWithPopup(auth, provider);
+                    await finishSocialLogin(result, providerName);
+                }
             } catch (error) {
+                console.error("Social login error:", error.code, error.message);
                 incrementFailedAttempt();
                 showToast(getErrorMessage(error), "error");
                 setLoadingState(providerName, false);
+                socialInProgress = false;
+            } finally {
+                if (!isMobile()) socialInProgress = false;
+                setLoadingState(providerName, false);
+            }
+        }
+
+        async function handleRedirectResult() {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    const providerId = result.providerId;
+                    const name = providerId === 'google.com' ? 'google' : providerId === 'github.com' ? 'github' : 'social';
+                    await finishSocialLogin(result, name);
+                }
+            } catch (error) {
+                console.error("Redirect result error:", error.code, error.message);
+                showToast(getErrorMessage(error), "error");
+            } finally {
+                socialInProgress = false;
+                setLoadingState('google', false);
+                setLoadingState('github', false);
             }
         }
 
         googleButton.addEventListener("click", () => {
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: "select_account" });
-            handleSocialLogin(provider, "google");
+            startSocialLogin(provider, "google");
         });
 
         githubButton.addEventListener("click", () => {
             const provider = new GithubAuthProvider();
             provider.addScope("read:user");
             provider.addScope("user:email");
-            handleSocialLogin(provider, "github");
+            startSocialLogin(provider, "github");
         });
 
         guestButton.addEventListener("click", async () => {
-            if (loading || offlineMode || isLocked()) return;
+            if (loading || offlineMode || isLocked() || socialInProgress) return;
             setLoadingState("guest", true, "Entering as guest...");
             try {
                 const result = await signInAnonymously(auth);
@@ -938,13 +969,13 @@
                 showToast("Entering as guest. You can link an account later.");
                 redirectToApp();
             } catch (error) {
+                console.error("Guest login error:", error.code, error.message);
                 incrementFailedAttempt();
                 showToast(getErrorMessage(error), "error");
                 setLoadingState("guest", false);
             }
         });
 
-        // ── Email/Password handler (with verification enforcement) ──
         authForm.addEventListener("submit", async event => {
             event.preventDefault();
             if (loading || offlineMode || isLocked()) return;
@@ -961,7 +992,6 @@
                     setLoadingState("submit", false);
                 } else {
                     const result = await signInWithEmailAndPassword(auth, email, password);
-                    // 🔐 Enforce email verification on login
                     await result.user.reload();
                     if (!result.user.emailVerified) {
                         await signOut(auth);
@@ -977,13 +1007,13 @@
                     redirectToApp();
                 }
             } catch (error) {
+                console.error("Email login error:", error.code, error.message);
                 incrementFailedAttempt();
                 showToast(getErrorMessage(error), "error");
                 setLoadingState("submit", false);
             }
         });
 
-        // Manual email verification check
         checkVerificationBtn.addEventListener("click", async () => {
             if (!auth.currentUser) return;
             const verified = await checkEmailVerification();
@@ -1013,7 +1043,6 @@
             });
         });
 
-        // ── Network detection ──
         window.addEventListener("offline", () => {
             offlineMode = true;
             showToast("You're offline. Check your connection.", "error");
@@ -1125,7 +1154,6 @@
             passwordToggle.textContent = hidden ? "◎" : "◉";
         });
 
-        // Inline validation on blur
         [nameInput, emailInput, passwordInput, confirmInput].forEach(input => {
             input.addEventListener("blur", () => {
                 if (input === nameInput && mode === "signup") validateField(nameInput, nameInput.value, nameError, { required: true, requiredMsg: "Name can't be empty." });
@@ -1140,26 +1168,27 @@
 
         passwordInput.addEventListener("input", updatePasswordStrength);
 
-        // ── Initial Auth State ──
+        // ── Init: handle redirect result, then check auth state ──
         let initialAuthCheck = true;
-        onAuthStateChanged(auth, user => {
-            skeletonLoader.style.display = "none";
-            if (initialAuthCheck && user) {
-                if (user.isAnonymous || (user.emailVerified !== false)) {
-                    initialAuthCheck = false;
-                    redirectToApp();
-                    return;
-                } else if (user.email && !user.emailVerified) {
-                    initialAuthCheck = false;
-                    showVerificationScreen(user.email);
-                    pollVerification(user);
-                    return;
+        handleRedirectResult().then(() => {
+            onAuthStateChanged(auth, user => {
+                skeletonLoader.style.display = "none";
+                if (initialAuthCheck && user) {
+                    if (user.isAnonymous || (user.emailVerified !== false)) {
+                        initialAuthCheck = false;
+                        redirectToApp();
+                        return;
+                    } else if (user.email && !user.emailVerified) {
+                        initialAuthCheck = false;
+                        showVerificationScreen(user.email);
+                        pollVerification(user);
+                        return;
+                    }
                 }
-            }
-            initialAuthCheck = false;
+                initialAuthCheck = false;
+            });
         });
 
-        // ── Error message mapping ──
         function getErrorMessage(error) {
             const messages = {
                 "auth/invalid-credential": "Incorrect email or password.",
@@ -1178,7 +1207,7 @@
             return messages[error.code] || error.message || "Authentication failed.";
         }
 
-        // ── Canvas animation (unchanged) ──
+        // ── Canvas animation (complete) ──
         const canvas = document.getElementById("bendCanvas");
         const ctx = canvas.getContext("2d");
         let width, height, dpr = 1;
