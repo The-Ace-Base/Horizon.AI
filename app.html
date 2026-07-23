@@ -617,20 +617,14 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    // ----- Supabase client -----
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAvg0MRndHXMLjhrJIukBRjzZ4ztRcEhfQ",
-      authDomain: "ace-horizon.firebaseapp.com",
-      projectId: "ace-horizon",
-      storageBucket: "ace-horizon.firebasestorage.app",
-      messagingSenderId: "1017523773217",
-      appId: "1:1017523773217:web:dbd7f5aa31f234d32aa860",
-      measurementId: "G-8TF3HYRPK6"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    // ⚠️ Replace these with your actual Supabase URL and anon key.
+    const supabaseUrl = "https://your-project-id.supabase.co";
+    const supabaseAnonKey = "your-anon-key";
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const $ = s => document.querySelector(s);
     const $$ = s => [...document.querySelectorAll(s)];
@@ -691,6 +685,9 @@
     let currentFilter = "all", generating = false, controller = null, generationChatId = null;
     let activeSpeechData = null, attachedImage = null, toastTimer;
 
+    // Supabase user will be stored here after session check
+    let currentUser = null;
+
     let canvasPaused = false;
     document.addEventListener("visibilitychange", () => { canvasPaused = document.hidden; });
     let streamThrottleScheduled = false, pendingStreamContent = null, pendingAssistantEl = null;
@@ -736,16 +733,37 @@
     matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{ if((localStorage.getItem(S.theme)||"dark")==="system") applyTheme("system"); });
     $("#themeToggleBtn").onclick = ()=>{ applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark"); };
 
-    onAuthStateChanged(auth,user=>{
-      if(!user){ location.replace("auth.html"); return; }
-      const savedName = localStorage.getItem(S.displayName) || (user.displayName||(user.isAnonymous?"Guest":user.email?.split("@")[0])||"Horizon User");
-      const savedSeed = localStorage.getItem(S.avatarSeed)||user.uid||"default";
-      const photoURL = user.photoURL;
-      if(photoURL){ $("#avatar").innerHTML=`<img src="${escapeHTML(photoURL)}" alt="avatar">`; }
-      else { const avatarUrl=`https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(savedSeed)}`; $("#avatar").innerHTML=`<img src="${avatarUrl}" alt="avatar">`; }
-      updateUserUI(savedName,savedSeed,photoURL);
+    // ----- Replace Firebase onAuthStateChanged with Supabase session check -----
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        location.replace("auth.html");
+        return;
+      }
+      currentUser = session.user;
+
+      const savedName =
+        localStorage.getItem(S.displayName) ||
+        currentUser.user_metadata?.full_name ||
+        currentUser.email?.split("@")[0] ||
+        "Horizon User";
+
+      const savedSeed =
+        localStorage.getItem(S.avatarSeed) ||
+        currentUser.id ||
+        "default";
+
+      const photoURL = currentUser.user_metadata?.avatar_url;
+
+      if (photoURL) {
+        $("#avatar").innerHTML = `<img src="${escapeHTML(photoURL)}" alt="avatar">`;
+      } else {
+        const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(savedSeed)}`;
+        $("#avatar").innerHTML = `<img src="${avatarUrl}" alt="avatar">`;
+      }
+      updateUserUI(savedName, savedSeed, photoURL);
       init();
-    });
+    })();
 
     function updateUserUI(name,seed,photoURL){
       $("#userName").textContent=name; $("#displayNameInput").value=name; $("#avatarSeed").value=seed;
@@ -784,7 +802,22 @@
 
     $("#userCard").onclick=(e)=>{ if(!e.target.closest('#socialLinks')){ haptic("medium"); openOverlay($("#logoutOverlay")); } };
     $("#cancelLogout").onclick=()=>{ closeOverlays(); };
-    $("#confirmLogout").onclick=async()=>{ haptic("heavy"); window.window.speechSynthesis.cancel(); if(controller) controller.abort(); try{ await signOut(auth); }catch(e){} Object.values(S).forEach(k=>localStorage.removeItem(k)); chats=[]; currentChatId=null; renderChat(); renderChatList(); closeOverlays(); toast("Logged out and data purged."); };
+
+    // ----- Logout using Supabase -----
+    $("#confirmLogout").onclick=async()=>{
+      haptic("heavy");
+      window.speechSynthesis.cancel();
+      if(controller) controller.abort();
+      try {
+        await supabase.auth.signOut();
+      } catch(e) {}
+      Object.values(S).forEach(k=>localStorage.removeItem(k));
+      chats=[]; currentChatId=null;
+      renderChat(); renderChatList();
+      closeOverlays();
+      toast("Logged out and data purged.");
+      location.replace("auth.html");
+    };
 
     $$("#traitChips .trait-chip").forEach(chip=>{
       chip.onclick=()=>{
@@ -1028,7 +1061,8 @@
       const el=document.createElement("article"); el.className=`message ${message.role}`; el.dataset.id=message.id;
       const isLatestEditable=message.role==="user"&&isLastUserMessage(message.id);
       const seed=localStorage.getItem(S.avatarSeed)||"default";
-      const userPhotoURL=auth.currentUser?.photoURL;
+      // Use currentUser from Supabase session instead of auth.currentUser
+      const userPhotoURL = currentUser?.user_metadata?.avatar_url;
       const userAvatar=message.role==="user"?(userPhotoURL?`<img src="${escapeHTML(userPhotoURL)}" alt="You" style="width:100%;height:100%;object-fit:cover;">`:`<img src="https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}" alt="You" style="width:100%;height:100%;object-fit:cover;">`):"";
       const assistantAvatar=message.role==="assistant"?saturnSVG():"";
       const bounceClass=(loading&&message.role==="assistant")?' avatar-bounce':'';
@@ -1084,17 +1118,17 @@
     }
 
     function toggleSpeech(text,btn,msgEl){
-      if(!window.window.window.speechSynthesis) return toast("TTS unavailable");
-      if(activeSpeechData&&activeSpeechData.button!==btn){ window.window.speechSynthesis.cancel(); removeTTSControls(activeSpeechData.button); activeSpeechData=null; }
+      if(!window.speechSynthesis) return toast("TTS unavailable");
+      if(activeSpeechData&&activeSpeechData.button!==btn){ window.speechSynthesis.cancel(); removeTTSControls(activeSpeechData.button); activeSpeechData=null; }
       if(activeSpeechData&&activeSpeechData.button===btn){
-        if(window.window.speechSynthesis.speaking&&!window.window.speechSynthesis.paused) window.window.speechSynthesis.pause();
-        else if(window.window.speechSynthesis.paused) window.window.speechSynthesis.resume();
+        if(window.speechSynthesis.speaking&&!window.speechSynthesis.paused) window.speechSynthesis.pause();
+        else if(window.speechSynthesis.paused) window.speechSynthesis.resume();
         return;
       }
       const clean=text.replace(/```[\s\S]*?```/g,"").replace(/[#*_`>\[\]()]/g," ").replace(/\s+/g," ").trim();
-      const utterance=new window.window.speechSynthesisUtterance(clean); utterance.rate=1; utterance.pitch=1;
+      const utterance=new SpeechSynthesisUtterance(clean); utterance.rate=1; utterance.pitch=1;
       createTTSControls(btn,msgEl); utterance.onend=utterance.onerror=()=>{ removeTTSControls(btn); activeSpeechData=null; };
-      activeSpeechData={utterance,button:btn,rate:1}; window.window.speechSynthesis.speak(utterance);
+      activeSpeechData={utterance,button:btn,rate:1}; window.speechSynthesis.speak(utterance);
     }
 
     function createTTSControls(btn,msgEl){
@@ -1103,8 +1137,8 @@
       btn.dataset.ttsId=ctrl.dataset.ttsId;
       ctrl.innerHTML=`<button class="tts-btn tts-stop"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button><button class="tts-btn tts-playpause"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button><button class="tts-btn tts-speed-down">−</button><span class="tts-speed">1×</span><button class="tts-btn tts-speed-up">+</button>`;
       msgEl.querySelector(".message-actions").insertAdjacentElement("afterend",ctrl);
-      ctrl.querySelector(".tts-stop").onclick=()=>{ window.window.speechSynthesis.cancel(); removeTTSControls(btn); activeSpeechData=null; };
-      ctrl.querySelector(".tts-playpause").onclick=()=>{ if(window.window.speechSynthesis.speaking&&!window.window.speechSynthesis.paused) window.window.speechSynthesis.pause(); else if(window.window.speechSynthesis.paused) window.window.speechSynthesis.resume(); };
+      ctrl.querySelector(".tts-stop").onclick=()=>{ window.speechSynthesis.cancel(); removeTTSControls(btn); activeSpeechData=null; };
+      ctrl.querySelector(".tts-playpause").onclick=()=>{ if(window.speechSynthesis.speaking&&!window.speechSynthesis.paused) window.speechSynthesis.pause(); else if(window.speechSynthesis.paused) window.speechSynthesis.resume(); };
       ctrl.querySelector(".tts-speed-down").onclick=()=>{ if(activeSpeechData){ activeSpeechData.rate=Math.max(0.25,activeSpeechData.rate-0.25); activeSpeechData.utterance.rate=activeSpeechData.rate; ctrl.querySelector(".tts-speed").textContent=activeSpeechData.rate+"×"; } };
       ctrl.querySelector(".tts-speed-up").onclick=()=>{ if(activeSpeechData){ activeSpeechData.rate=Math.min(4,activeSpeechData.rate+0.25); activeSpeechData.utterance.rate=activeSpeechData.rate; ctrl.querySelector(".tts-speed").textContent=activeSpeechData.rate+"×"; } };
     }
@@ -1211,7 +1245,7 @@
       }
     }
 
-    function stop(){ controller?.abort(); window.window.speechSynthesis?.cancel(); }
+    function stop(){ controller?.abort(); window.speechSynthesis?.cancel(); }
     function updateSend(){ $("#sendIcon").innerHTML=generating?'<rect x="7" y="7" width="10" height="10" rx="1.5" fill="currentColor" stroke="none"/>':'<path d="M12 19V5M6 11l6-6 6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'; }
     function resizePrompt(){ const p=$("#prompt"); p.style.height="auto"; p.style.height=Math.min(p.scrollHeight,180)+"px"; }
     $("#prompt").oninput=resizePrompt;
